@@ -228,7 +228,7 @@ document.addEventListener('click', async e => {
   if (t.id === 'btnsend') {
     const email = $('email').value.trim(); if (!email) return;
     t.disabled = true;
-    const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: 'https://kevindhoyos01-cyber.github.io/despensa-2/' } });
+    const { error } = await sb.auth.signlnWithOtp({email, options:{emailredirectTo:window.location.origin+window.location.pathname}});
     t.disabled = false;
     $('msg').textContent = error ? error.message : '¡Listo! Revisa tu correo 📬';
     return;
