@@ -164,7 +164,7 @@ function render() {
 
 function renderProducts() {
   let h = '<div class="chips"><button class="chip' + (state.cat==='Todas'?' on':'') + '" data-cat="Todas">Todas</button>';
-  state.categories.forEach(c => { h += <button class="chip${state.cat===c.name?' on':''}" data-cat="${esc(c.name)}">${esc(c.name)}</button>; });
+  state.categories.forEach(c => { h += `<button class="chip${state.cat===c.name?' on':''}" data-cat="${esc(c.name)}">${esc(c.name)}</button>`; });
   h += '</div>';
   const catId = state.categories.find(c => c.name === state.cat)?.id;
   let list = state.products.filter(p => state.cat==='Todas' || p.category_id === catId);
