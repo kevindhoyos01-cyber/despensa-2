@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mi despensa</title>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
-<!-- Librería de Supabase (Versión estable) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
@@ -64,10 +63,8 @@ a{color:var(--brand);font-weight:600}
 <div id="modal"></div>
 
 <script>
-// 👇 REEMPLAZA ESTO CON TUS DATOS REALES DE SUPABASE 👇
 const SUPABASE_URL = "https://huvfflasvaalgewlpqny.supabase.co/rest/v1/";
 const SUPABASE_KEY = "sb_publishable_fKxh6DRI06AIEmXOfbeBnA_ljL5EBOF";
-// 👆 REEMPLAZA ESTO CON TUS DATOS REALES DE SUPABASE 👆
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { flowType: 'implicit', persistSession: true, detectSessionInUrl: true }
@@ -232,7 +229,6 @@ document.addEventListener('click', async e => {
     t.disabled = true;
     $('msg').textContent = 'Enviando...';
     try {
-      // Aseguramos que la URL de redirección sea exactamente la que está en Supabase (con o sin barra al final)
       const currentUrl = window.location.origin + window.location.pathname;
       const redirectUrl = currentUrl.endsWith('/') ? currentUrl : currentUrl + '/';
       
