@@ -144,7 +144,8 @@ function render() {
   if (state.loading) { $('header').innerHTML = ''; $('view').innerHTML = ''; $('fab').innerHTML = ''; return; }
   if (!state.user) {
     $('header').innerHTML = '';
-    $('view').innerHTML = <div style="max-width:400px;margin:60px auto;padding:0 8px"><h1 style="text-align:center">🥕 Mi despensa</h1><p class="sub" style="text-align:center">Entra con tu correo. Te enviamos un enlace mágico.</p><input id="email" type="email" placeholder="tucorreo@ejemplo.com" style="margin-bottom:10px"><button class="btn" id="btnsend" style="width:100%">Enviar enlace</button><p id="msg" class="cat" style="text-align:center;margin-top:14px"></p></div>;
+   $('view').innerHTML = `
+  <div style="max-width:400px;margin:60px auto;padding:0 8px"><h1 style="text-align:center">🥕 Mi despensa</h1><p class="sub" style="text-align:center">Entra con tu correo. Te enviamos un enlace mágico.</p><input id="email" type="email" placeholder="tucorreo@ejemplo.com" style="margin-bottom:10px"><button class="btn" id="btnsend" style="width:100%">Enviar enlace</button><p id="msg" class="cat" style="text-align:center;margin-top:14px"></p></div>`;
     $('fab').innerHTML = '';
     return;
   }
