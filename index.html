@@ -5,14 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mi despensa</title>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase-js@2.49.4"></script>
+<!-- Librería de Supabase (Versión estable) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 :root{--bg:#eef3ef;--card:#fff;--ink:#16322a;--mute:#5d7068;--line:#d6e0da;--brand:#1e6b4f;--onbrand:#fff;--full:#2f9e5b;--mid:#d99a14;--low:#d6452f;--out:#8a958f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1b16;--card:#17261f;--ink:#e6f1eb;--mute:#93a89d;--line:#2a3d34;--brand:#5fc596;--onbrand:#0f1b16;--full:#45b872;--mid:#e5ad2e;--low:#ef6a55;--out:#7b887f}}
 :root[data-theme="dark"]{--bg:#0f1b16;--card:#17261f;--ink:#e6f1eb;--mute:#93a89d;--line:#2a3d34;--brand:#5fc596;--onbrand:#0f1b16;--full:#45b872;--mid:#e5ad2e;--low:#ef6a55;--out:#7b887f}
 html{color-scheme:light dark;scroll-padding-top:env(safe-area-inset-top,0px)}
-*,*::before,*::after{box-sizing:border-box}
+,::before,*::after{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif}
 .wrap{max-width:720px;margin:0 auto;padding:16px 16px 90px}
 h1{font-size:2rem;font-weight:800;letter-spacing:-.02em;margin:8px 0 2px}
@@ -63,10 +64,10 @@ a{color:var(--brand);font-weight:600}
 <div id="modal"></div>
 
 <script>
-// 👇 REEMPLAZA ESTAS DOS LÍNEAS CON TUS DATOS DEL PASO 6 👇
+// 👇 REEMPLAZA ESTO CON TUS DATOS REALES DE SUPABASE 👇
 const SUPABASE_URL = "https://huvfflasvaalgewlpqny.supabase.co/rest/v1/";
 const SUPABASE_KEY = "sb_publishable_fKxh6DRI06AIEmXOfbeBnA_ljL5EBOF";
-// 👆 REEMPLAZA ESTAS DOS LÍNEAS CON TUS DATOS DEL PASO 6 👆
+// 👆 REEMPLAZA ESTO CON TUS DATOS REALES DE SUPABASE 👆
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { flowType: 'implicit', persistSession: true, detectSessionInUrl: true }
@@ -146,17 +147,17 @@ function render() {
   if (state.loading) { $('header').innerHTML = ''; $('view').innerHTML = ''; $('fab').innerHTML = ''; return; }
   if (!state.user) {
     $('header').innerHTML = '';
-    $('view').innerHTML = `<div style="max-width:400px;margin:60px auto;padding:0 8px"><h1 style="text-align:center">🥕 Mi despensa</h1><p class="sub" style="text-align:center">Entra con tu correo. Te enviamos un enlace mágico.</p><input id="email" type="email" placeholder="tucorreo@ejemplo.com" style="margin-bottom:10px"><button class="btn" id="btnsend" style="width:100%">Enviar enlace</button><p id="msg" class="cat" style="text-align:center;margin-top:14px"></p></div>`;
+    $('view').innerHTML = <div style="max-width:400px;margin:60px auto;padding:0 8px"><h1 style="text-align:center">🥕 Mi despensa</h1><p class="sub" style="text-align:center">Entra con tu correo. Te enviamos un enlace mágico.</p><input id="email" type="email" placeholder="tucorreo@ejemplo.com" style="margin-bottom:10px"><button class="btn" id="btnsend" style="width:100%">Enviar enlace</button><p id="msg" class="cat" style="text-align:center;margin-top:14px"></p></div>;
     $('fab').innerHTML = '';
     return;
   }
-  $('header').innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h1>🥕 Mi despensa</h1><div style="display:flex;gap:6px"><button class="btn alt" id="btninvite">Invitar</button><button class="btn alt" id="btnlogout">Salir</button></div></div><p class="sub" style="font-size:.8rem">${esc(state.user.email)}</p><div class="tabs"><button class="${state.tab==='p'?'on':''}" data-tab="p">Productos</button><button class="${state.tab==='s'?'on':''}" data-tab="s">Mis súpers</button></div>`;
+  $('header').innerHTML = <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h1>🥕 Mi despensa</h1><div style="display:flex;gap:6px"><button class="btn alt" id="btninvite">Invitar</button><button class="btn alt" id="btnlogout">Salir</button></div></div><p class="sub" style="font-size:.8rem">${esc(state.user.email)}</p><div class="tabs"><button class="${state.tab==='p'?'on':''}" data-tab="p">Productos</button><button class="${state.tab==='s'?'on':''}" data-tab="s">Mis súpers</button></div>;
   if (state.tab === 'p') renderProducts(); else renderSupermarkets();
 }
 
 function renderProducts() {
   let h = '<div class="chips"><button class="chip' + (state.cat==='Todas'?' on':'') + '" data-cat="Todas">Todas</button>';
-  state.categories.forEach(c => { h += `<button class="chip${state.cat===c.name?' on':''}" data-cat="${esc(c.name)}">${esc(c.name)}</button>`; });
+  state.categories.forEach(c => { h += <button class="chip${state.cat===c.name?' on':''}" data-cat="${esc(c.name)}">${esc(c.name)}</button>; });
   h += '</div>';
   const catId = state.categories.find(c => c.name === state.cat)?.id;
   let list = state.products.filter(p => state.cat==='Todas' || p.category_id === catId);
@@ -167,35 +168,35 @@ function renderProducts() {
     const s = stat(p);
     const cat = state.categories.find(c => c.id === p.category_id)?.name || '';
     const shared = p.user_id !== state.user.id ? ' <span class="cat">· compartido</span>' : '';
-    h += `<div class="item ${s.k}"><div class="top"><button class="name" data-open="${p.id}">${esc(p.name)}</button><span class="st ${s.k}">${s.t}</span></div><div class="cat">${esc(cat)}${shared} · quedan ${fmt(p.quantity)} de ${fmt(p.capacity)} ${esc(p.unit)}</div><div class="bar ${s.k}"><i style="width:${Math.round(s.r*100)}%"></i></div><div class="use"><input type="number" inputmode="decimal" min="0" step="any" placeholder="Cantidad" id="u${p.id}"><button class="btn" data-use="${p.id}">Usé</button></div></div>`;
+    h += <div class="item ${s.k}"><div class="top"><button class="name" data-open="${p.id}">${esc(p.name)}</button><span class="st ${s.k}">${s.t}</span></div><div class="cat">${esc(cat)}${shared} · quedan ${fmt(p.quantity)} de ${fmt(p.capacity)} ${esc(p.unit)}</div><div class="bar ${s.k}"><i style="width:${Math.round(s.r*100)}%"></i></div><div class="use"><input type="number" inputmode="decimal" min="0" step="any" placeholder="Cantidad" id="u${p.id}"><button class="btn" data-use="${p.id}">Usé</button></div></div>;
   });
   $('view').innerHTML = h;
-  $('fab').innerHTML = `<button class="btn" id="addp">Añadir</button>`;
+  $('fab').innerHTML = <button class="btn" id="addp">Añadir</button>;
 }
 
 function renderSupermarkets() {
   let h = '<p class="sub">Tus súpers de siempre. En la ficha de cada producto verás un enlace para buscarlo en cada uno.</p>';
   if (!state.supermarkets.length) h += '<div class="empty">Aún no hay súpers. Toca "Añadir súper".</div>';
   state.supermarkets.forEach(s => {
-    h += `<div class="item"><div class="top"><span class="name">${esc(s.name)}</span><a href="${esc(s.url_base||'')}" target="_blank" rel="noopener">Abrir web</a></div><div class="cat">${esc(s.search_template||s.url_base||'')}</div><div class="row" style="margin-top:8px"><button class="btn alt" data-es="${s.id}">Editar</button><button class="btn del" data-ds="${s.id}">Quitar</button></div></div>`;
+    h += <div class="item"><div class="top"><span class="name">${esc(s.name)}</span><a href="${esc(s.url_base||'')}" target="_blank" rel="noopener">Abrir web</a></div><div class="cat">${esc(s.search_template||s.url_base||'')}</div><div class="row" style="margin-top:8px"><button class="btn alt" data-es="${s.id}">Editar</button><button class="btn del" data-ds="${s.id}">Quitar</button></div></div>;
   });
   $('view').innerHTML = h;
-  $('fab').innerHTML = `<button class="btn" id="adds">Añadir súper</button>`;
+  $('fab').innerHTML = <button class="btn" id="adds">Añadir súper</button>;
 }
 
-function openModal(html) { $('modal').innerHTML = `<div class="ov" id="ov"><div class="sheet">${html}</div></div>`; }
+function openModal(html) { $('modal').innerHTML = <div class="ov" id="ov"><div class="sheet">${html}</div></div>; }
 function closeModal() { $('modal').innerHTML = ''; }
 
 function showDetail(id) {
   const p = state.products.find(x => x.id === id); if (!p) return;
   const s = stat(p);
   const cat = state.categories.find(c => c.id === p.category_id)?.name || '';
-  let h = `<div class="top"><h2 style="margin:0">${esc(p.name)}</h2><button class="btn alt" data-close="1">Cerrar</button></div><div class="cat">${esc(cat)}</div><div class="item ${s.k}" style="margin-top:10px"><div class="st ${s.k}">${s.t}</div><div class="bar ${s.k}"><i style="width:${Math.round(s.r*100)}%"></i></div><div>Quedan <b>${fmt(p.quantity)}</b> de ${fmt(p.capacity)} ${esc(p.unit)}</div><div class="use"><input type="number" inputmode="decimal" min="0" step="any" placeholder="Cantidad" id="dq"><button class="btn" data-duse="${p.id}">Usé</button><button class="btn alt" data-dadd="${p.id}">Repuse</button></div><div class="row" style="margin-top:8px"><button class="btn alt" data-full="${p.id}">Rellenar al máximo</button></div></div>`;
-  if (p.ingredients) h += `<h3>Qué contiene</h3><div class="box">${esc(p.ingredients)}</div>`;
-  if (p.allergens) h += `<h3>Alérgenos</h3><div class="box">${esc(p.allergens)}</div>`;
+  let h = <div class="top"><h2 style="margin:0">${esc(p.name)}</h2><button class="btn alt" data-close="1">Cerrar</button></div><div class="cat">${esc(cat)}</div><div class="item ${s.k}" style="margin-top:10px"><div class="st ${s.k}">${s.t}</div><div class="bar ${s.k}"><i style="width:${Math.round(s.r*100)}%"></i></div><div>Quedan <b>${fmt(p.quantity)}</b> de ${fmt(p.capacity)} ${esc(p.unit)}</div><div class="use"><input type="number" inputmode="decimal" min="0" step="any" placeholder="Cantidad" id="dq"><button class="btn" data-duse="${p.id}">Usé</button><button class="btn alt" data-dadd="${p.id}">Repuse</button></div><div class="row" style="margin-top:8px"><button class="btn alt" data-full="${p.id}">Rellenar al máximo</button></div></div>;
+  if (p.ingredients) h += <h3>Qué contiene</h3><div class="box">${esc(p.ingredients)}</div>;
+  if (p.allergens) h += <h3>Alérgenos</h3><div class="box">${esc(p.allergens)}</div>;
   h += '<h3>Buscar en mis súpers</h3><div class="row">';
   if (!state.supermarkets.length) h += '<span class="cat">Añade súpers en la pestaña "Mis súpers".</span>';
-  state.supermarkets.forEach(x => { const url = storeUrl(x, p); if (url) h += `<a class="chip" href="${esc(url)}" target="_blank" rel="noopener">${esc(x.name)}</a>`; });
+  state.supermarkets.forEach(x => { const url = storeUrl(x, p); if (url) h += <a class="chip" href="${esc(url)}" target="_blank" rel="noopener">${esc(x.name)}</a>; });
   h += '</div><h3>Etiqueta QR</h3><div class="qr" id="qr"></div><p class="cat">Código: <b>' + p.qr_token + '</b></p><div class="row"><button class="btn alt" data-edit="${p.id}">Editar</button><button class="btn del" data-del="${p.id}">Eliminar</button></div>';
   openModal(h);
   try { new QRCode($('qr'), { text: p.qr_token, width: 150, height: 150 }); } catch(e) { $('qr').textContent = 'QR no disponible'; }
@@ -203,21 +204,21 @@ function showDetail(id) {
 
 function showForm(id) {
   const p = state.products.find(x => x.id === id) || { name: '', category_id: state.categories[0]?.id, unit: 'unidad', capacity: 1, quantity: 1, ingredients: '', allergens: '' };
-  let optCat = state.categories.map(c => `<option value="${c.id}"${c.id===p.category_id?' selected':''}>${esc(c.name)}</option>`).join('');
-  let optUnit = ['unidad','g','kg','ml','l'].map(u => `<option${u===p.unit?' selected':''}>${u}</option>`).join('');
-  openModal(`<h2 style="margin:0 0 6px">${id?'Editar producto':'Nuevo producto'}</h2><label>Nombre</label><input id="fn" value="${esc(p.name)}"><div class="grid2"><div><label>Categoría</label><select id="fc">${optCat}</select></div><div><label>Unidad</label><select id="fu">${optUnit}</select></div><div><label>Cantidad llena</label><input id="fcap" type="number" inputmode="decimal" step="any" value="${p.capacity}"></div><div><label>Cantidad actual</label><input id="fcur" type="number" inputmode="decimal" step="any" value="${p.quantity}"></div></div><label>Umbral "se está acabando"</label><input id="flow" type="number" inputmode="decimal" step="any" value="${p.threshold_low||0}"><label>Umbral "se va a acabar"</label><input id="fcr" type="number" inputmode="decimal" step="any" value="${p.threshold_critical||0}"><label>Ingredientes / contenido</label><textarea id="fing">${esc(p.ingredients||'')}</textarea><label>Alérgenos</label><input id="fal" value="${esc(p.allergens||'')}"><div class="row" style="margin-top:14px"><button class="btn" data-savep="${id||''}">Guardar</button><button class="btn alt" data-close="1">Cancelar</button></div>`);
+  let optCat = state.categories.map(c => <option value="${c.id}"${c.id===p.category_id?' selected':''}>${esc(c.name)}</option>).join('');
+  let optUnit = ['unidad','g','kg','ml','l'].map(u => <option${u===p.unit?' selected':''}>${u}</option>).join('');
+  openModal(<h2 style="margin:0 0 6px">${id?'Editar producto':'Nuevo producto'}</h2><label>Nombre</label><input id="fn" value="${esc(p.name)}"><div class="grid2"><div><label>Categoría</label><select id="fc">${optCat}</select></div><div><label>Unidad</label><select id="fu">${optUnit}</select></div><div><label>Cantidad llena</label><input id="fcap" type="number" inputmode="decimal" step="any" value="${p.capacity}"></div><div><label>Cantidad actual</label><input id="fcur" type="number" inputmode="decimal" step="any" value="${p.quantity}"></div></div><label>Umbral "se está acabando"</label><input id="flow" type="number" inputmode="decimal" step="any" value="${p.threshold_low||0}"><label>Umbral "se va a acabar"</label><input id="fcr" type="number" inputmode="decimal" step="any" value="${p.threshold_critical||0}"><label>Ingredientes / contenido</label><textarea id="fing">${esc(p.ingredients||'')}</textarea><label>Alérgenos</label><input id="fal" value="${esc(p.allergens||'')}"><div class="row" style="margin-top:14px"><button class="btn" data-savep="${id||''}">Guardar</button><button class="btn alt" data-close="1">Cancelar</button></div>);
 }
 
 function showSuperForm(id) {
   const s = state.supermarkets.find(x => x.id === id) || { name: '', url_base: 'https://', search_template: '' };
-  openModal(`<h2 style="margin:0 0 6px">${id?'Editar súper':'Nuevo súper'}</h2><label>Nombre</label><input id="sn" value="${esc(s.name)}"><label>Página web</label><input id="su" type="url" value="${esc(s.url_base)}"><label>Plantilla de búsqueda (opcional)</label><input id="st" value="${esc(s.search_template||'')}" placeholder="https://tusuper.com/buscar?q={q}"><p class="cat">Si rellenas la plantilla, el botón del producto te llevará directo a la búsqueda.</p><div class="row"><button class="btn" data-saves="${id||''}">Guardar</button><button class="btn alt" data-close="1">Cancelar</button></div>`);
+  openModal(<h2 style="margin:0 0 6px">${id?'Editar súper':'Nuevo súper'}</h2><label>Nombre</label><input id="sn" value="${esc(s.name)}"><label>Página web</label><input id="su" type="url" value="${esc(s.url_base)}"><label>Plantilla de búsqueda (opcional)</label><input id="st" value="${esc(s.search_template||'')}" placeholder="https://tusuper.com/buscar?q={q}"><p class="cat">Si rellenas la plantilla, el botón del producto te llevará directo a la búsqueda.</p><div class="row"><button class="btn" data-saves="${id||''}">Guardar</button><button class="btn alt" data-close="1">Cancelar</button></div>);
 }
 
 async function showInvite() {
   const { data, error } = await sb.from('inventory_invites').insert({ owner_id: state.user.id }).select().single();
   if (error) { alert(error.message); return; }
-  const url = `${location.origin}${location.pathname}?invite=${data.token}`;
-  openModal(`<h2 style="margin:0 0 6px">Invitar a compartir</h2><p class="cat">Comparte este enlace. Quien lo abra y entre con su correo podrá ver y editar tu despensa.</p><div class="box" style="word-break:break-all">${esc(url)}</div><p class="cat">Caduca en 7 días.</p><div class="row"><button class="btn" id="btncopy">Copiar enlace</button><button class="btn alt" data-close="1">Cerrar</button></div>`);
+  const url = ${location.origin}${location.pathname}?invite=${data.token};
+  openModal(<h2 style="margin:0 0 6px">Invitar a compartir</h2><p class="cat">Comparte este enlace. Quien lo abra y entre con su correo podrá ver y editar tu despensa.</p><div class="box" style="word-break:break-all">${esc(url)}</div><p class="cat">Caduca en 7 días.</p><div class="row"><button class="btn" id="btncopy">Copiar enlace</button><button class="btn alt" data-close="1">Cerrar</button></div>);
   $('btncopy').onclick = () => { navigator.clipboard.writeText(url); $('btncopy').textContent = '¡Copiado!'; };
 }
 
@@ -226,13 +227,32 @@ document.addEventListener('click', async e => {
   const d = t.dataset;
 
   if (t.id === 'btnsend') {
-    const email = $('email').value.trim(); if (!email) return;
+    const email = $('email').value.trim(); 
+    if (!email) return;
     t.disabled = true;
-    const { error } = await sb.auth.signlnWithOtp({email, options:{emailredirectTo:window.location.origin+window.location.pathname}});
-    t.disabled = false;
-    $('msg').textContent = error ? error.message : '¡Listo! Revisa tu correo 📬';
+    $('msg').textContent = 'Enviando...';
+    try {
+      // Aseguramos que la URL de redirección sea exactamente la que está en Supabase (con o sin barra al final)
+      const currentUrl = window.location.origin + window.location.pathname;
+      const redirectUrl = currentUrl.endsWith('/') ? currentUrl : currentUrl + '/';
+      
+      const { error } = await sb.auth.signInWithOtp({ 
+        email, 
+        options: { emailRedirectTo: redirectUrl } 
+      });
+      t.disabled = false;
+      if (error) {
+        $('msg').textContent = 'Error: ' + error.message;
+      } else {
+        $('msg').textContent = '¡Listo! Revisa tu correo 📬';
+      }
+    } catch (err) {
+      t.disabled = false;
+      $('msg').textContent = 'Fallo de conexión: ' + err.message;
+    }
     return;
   }
+  
   if (t.id === 'btnlogout') { await sb.auth.signOut(); return; }
   if (t.id === 'btninvite') { await showInvite(); return; }
   if (d.tab) { state.tab = d.tab; render(); return; }
