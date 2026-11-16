@@ -175,8 +175,7 @@ function renderProducts() {
     const s = stat(p);
     const cat = state.categories.find(c => c.id === p.category_id)?.name || '';
     const shared = p.user_id !== state.user.id ? ' <span class="cat">· compartido</span>' : '';
-    h += <div class="item ${s.k}"><div class="top"><button class="name" data-open="${p.id}">${esc(p.name)}</button><span class="st ${s.k}">${s.t}</span></div><div class="cat">${esc(cat)}${shared} · quedan ${fmt(p.quantity)} de ${fmt(p.capacity)} ${esc(p.unit)}</div><div class="bar ${s.k}"><i style="width:${Math.round(s.r*100)}%"></i></div><div class="use"><input type="number" inputmode="decimal" min="0" step="any" placeholder="Cantidad" id="u${p.id}"><button class="btn" data-use="${p.id}">Usé</button></div></div>;
-  });
+h += `<div class="item ${s.k}"><div class="top"><button class="name" data-open="${p.id}">${esc(p.name)}</button><span class="st ${s.k}">${s.t}</span></div><div class="cat">${esc(cat)}${shared} · quedan ${fmt(p.quantity)} de ${fmt(p.capacity)} ${esc(p.unit)}</div><div class="bar ${s.k}"><i style="width:${Math.round(s.r*100)}%"></i></div><div class="use"><input type="number" inputmode="decimal" min="0" step="any" placeholder="Cantidad" id="u${p.id}"><button class="btn" data-use="${p.id}">Usé</button></div></div>`;  });
   $('view').innerHTML = h;
   $('fab').innerHTML = <button class="btn" id="addp">Añadir</button>;
 }
