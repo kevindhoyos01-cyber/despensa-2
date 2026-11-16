@@ -184,7 +184,7 @@ function renderSupermarkets() {
   let h = '<p class="sub">Tus súpers de siempre. En la ficha de cada producto verás un enlace para buscarlo en cada uno.</p>';
   if (!state.supermarkets.length) h += '<div class="empty">Aún no hay súpers. Toca "Añadir súper".</div>';
   state.supermarkets.forEach(s => {
-    h += <div class="item"><div class="top"><span class="name">${esc(s.name)}</span><a href="${esc(s.url_base||'')}" target="_blank" rel="noopener">Abrir web</a></div><div class="cat">${esc(s.search_template||s.url_base||'')}</div><div class="row" style="margin-top:8px"><button class="btn alt" data-es="${s.id}">Editar</button><button class="btn del" data-ds="${s.id}">Quitar</button></div></div>;
+   h += `<div class="item"><div class="top"><span class="name">${esc(s.name)}</span><a href="${esc(s.url_base||'')}" target="_blank" rel="noopener">Abrir web</a></div><div class="cat">${esc(s.search_template||s.url_base||'')}</div><div class="row" style="margin-top:8px"><button class="btn alt" data-es="${s.id}">Editar</button><button class="btn del" data-ds="${s.id}">Quitar</button></div></div>`;
   });
   $('view').innerHTML = h;
   $('fab').innerHTML = <button class="btn" id="adds">Añadir súper</button>;
