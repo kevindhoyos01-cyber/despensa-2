@@ -335,8 +335,9 @@ document.addEventListener('click', async e => {
 document.addEventListener('mousedown', e => { if (e.target.id === 'ov') closeModal(); });
 
 boot();
-If ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js');
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js');
 }
 </script>
 </body>
