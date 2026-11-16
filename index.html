@@ -158,7 +158,7 @@ function render() {
     $('fab').innerHTML = '';
     return;
   }
-  $('header').innerHTML = <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h1>🥕 Mi despensa</h1><div style="display:flex;gap:6px"><button class="btn alt" id="btninvite">Invitar</button><button class="btn alt" id="btnlogout">Salir</button></div></div><p class="sub" style="font-size:.8rem">${esc(state.user.email)}</p><div class="tabs"><button class="${state.tab==='p'?'on':''}" data-tab="p">Productos</button><button class="${state.tab==='s'?'on':''}" data-tab="s">Mis súpers</button></div>;
+  $('header').innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h1>🥕 Mi despensa</h1><div style="display:flex;gap:6px"><button class="btn alt" id="btninvite">Invitar</button><button class="btn alt" id="btnlogout">Salir</button></div></div><p class="sub" style="font-size:.8rem">${esc(state.user.email)}</p><div class="tabs"><button class="${state.tab==='p'?'on':''}" data-tab="p">Productos</button><button class="${state.tab==='s'?'on':''}" data-tab="s">Mis súpers</button></div>`;
   if (state.tab === 'p') renderProducts(); else renderSupermarkets();
 }
 
