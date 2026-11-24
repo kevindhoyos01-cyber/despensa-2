@@ -35,6 +35,7 @@ input,select,textarea{width:100%;background:var(--card);border:1px solid var(--l
 textarea{min-height:90px;resize:vertical}
 label{display:block;font-size:.85rem;color:var(--mute);margin:10px 0 4px}
 .btn{border:0;background:var(--brand);color:var(--onbrand);font-weight:600;border-radius:10px;padding:10px 14px;cursor:pointer}
+.btn:disabled{opacity:.6;cursor:default}
 .btn.alt{background:none;color:var(--ink);border:1px solid var(--line)}
 .btn.del{background:none;color:var(--low);border:1px solid var(--low)}
 .item{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px;border-left:8px solid var(--out)}
@@ -57,6 +58,7 @@ label{display:block;font-size:.85rem;color:var(--mute);margin:10px 0 4px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .empty{text-align:center;color:var(--mute);padding:30px 10px}
 a{color:var(--brand);font-weight:600}
+.codein{text-align:center;font-size:1.5rem;letter-spacing:.25em;margin-bottom:10px}
 </style>
 </head>
 <body>
@@ -76,7 +78,14 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { flowType: 'implicit', persistSession: true, detectSessionInUrl: true }
 });
 
-const state = { user: null, products: [], supermarkets: [], categories: [], tab: 'p', cat: 'Todas', loading: true };
+// Guardado seguro del correo pendiente de verificar (en iPhone la app puede recargarse al ir a leer el correo)
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+  del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+
+const state = { user: null, products: [], supermarkets: [], categories: [], tab: 'p', cat: 'Todas', loading: true, otpEmail: store.get('otp_email') || '' };
 const $ = i => document.getElementById(i);
 const esc = t => String(t ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const num = v => { const n = parseFloat(String(v).replace(',','.')); return isNaN(n) ? 0 : n; };
@@ -110,6 +119,7 @@ async function boot() {
     const { data: { session } } = await sb.auth.getSession();
     if (session?.user) {
       state.user = session.user;
+      state.otpEmail = ''; store.del('otp_email');
       await onLogin();
       render();
     }
@@ -118,14 +128,14 @@ async function boot() {
     sb.auth.onAuthStateChange(async (_, session) => {
       const was = !!state.user;
       state.user = session?.user ?? null;
-      if (state.user && !was) { await onLogin(); render(); }
+      if (state.user && !was) { state.otpEmail = ''; store.del('otp_email'); await onLogin(); render(); }
       else if (!state.user && was) { state.products = []; state.supermarkets = []; render(); }
     });
   } catch (error) {
     console.error("Error al iniciar:", error);
     $('view').innerHTML = `<div style="text-align:center;padding:20px;color:red;">
       <h2>Error de conexión</h2>
-      <p>${error.message}</p>
+      <p>${esc(error.message)}</p>
     </div>`;
   }
 }
@@ -166,8 +176,14 @@ function render() {
   if (state.loading) { $('header').innerHTML = ''; $('view').innerHTML = ''; $('fab').innerHTML = ''; return; }
   if (!state.user) {
     $('header').innerHTML = '';
-    $('view').innerHTML = `<div style="max-width:400px;margin:60px auto;padding:0 8px"><h1 style="text-align:center">🥕 Mi despensa</h1><p class="sub" style="text-align:center">Entra con tu correo. Te enviamos un enlace mágico.</p><input id="email" type="email" placeholder="tucorreo@ejemplo.com" style="margin-bottom:10px"><button class="btn" id="btnsend" style="width:100%">Enviar enlace</button><p id="msg" class="cat" style="text-align:center;margin-top:14px"></p></div>`;
     $('fab').innerHTML = '';
+    if (!state.otpEmail) {
+      // Paso 1: pedir el correo
+      $('view').innerHTML = `<div style="max-width:400px;margin:60px auto;padding:0 8px"><h1 style="text-align:center">🥕 Mi despensa</h1><p class="sub" style="text-align:center">Entra con tu correo. Te enviamos un código para iniciar sesión.</p><input id="email" type="email" inputmode="email" autocomplete="email" autocapitalize="none" placeholder="tucorreo@ejemplo.com" style="margin-bottom:10px"><button class="btn" id="btnsend" style="width:100%">Enviar código</button><p id="msg" class="cat" style="text-align:center;margin-top:14px"></p></div>`;
+    } else {
+      // Paso 2: escribir el código recibido
+      $('view').innerHTML = `<div style="max-width:400px;margin:60px auto;padding:0 8px"><h1 style="text-align:center">🥕 Mi despensa</h1><p class="sub" style="text-align:center">Te enviamos un código a <b>${esc(state.otpEmail)}</b>. Escríbelo aquí.</p><input id="code" class="codein" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="Código"><button class="btn" id="btnverify" style="width:100%">Entrar</button><div class="row" style="justify-content:center;margin-top:12px"><button class="btn alt" id="btnresend">Reenviar código</button><button class="btn alt" id="btnback">Cambiar correo</button></div><p id="msg" class="cat" style="text-align:center;margin-top:14px"></p></div>`;
+    }
     return;
   }
   $('header').innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><h1>🥕 Mi despensa</h1><div style="display:flex;gap:6px"><button class="btn alt" id="btninvite">Invitar</button><button class="btn alt" id="btnlogout">Salir</button></div></div><p class="sub" style="font-size:.8rem">${esc(state.user.email)}</p><div class="tabs"><button class="${state.tab==='p'?'on':''}" data-tab="p">Productos</button><button class="${state.tab==='s'?'on':''}" data-tab="s">Mis súpers</button></div>`;
@@ -216,9 +232,10 @@ function showDetail(id) {
   h += '<h3>Buscar en mis súpers</h3><div class="row">';
   if (!state.supermarkets.length) h += '<span class="cat">Añade súpers en la pestaña "Mis súpers".</span>';
   state.supermarkets.forEach(x => { const url = storeUrl(x, p); if (url) h += `<a class="chip" href="${esc(url)}" target="_blank" rel="noopener">${esc(x.name)}</a>`; });
-  h += '</div><h3>Etiqueta QR</h3><div class="qr" id="qr"></div><p class="cat">Código: <b>' + p.qr_token + '</b></p><div class="row"><button class="btn alt" data-edit="${p.id}">Editar</button><button class="btn del" data-del="${p.id}">Eliminar</button></div>';
+  // CORREGIDO: antes estas líneas usaban comillas simples y los botones Editar/Eliminar no recibían el id
+  h += `</div><h3>Etiqueta QR</h3><div class="qr" id="qr"></div><p class="cat">Código: <b>${esc(p.qr_token)}</b></p><div class="row"><button class="btn alt" data-edit="${p.id}">Editar</button><button class="btn del" data-del="${p.id}">Eliminar</button></div>`;
   openModal(h);
-  try { new QRCode($('qr'), { text: p.qr_token, width: 150, height: 150 }); } catch(e) { $('qr').textContent = 'QR no disponible'; }
+  try { new QRCode($('qr'), { text: String(p.qr_token), width: 150, height: 150 }); } catch(e) { $('qr').textContent = 'QR no disponible'; }
 }
 
 function showForm(id) {
@@ -241,36 +258,69 @@ async function showInvite() {
   $('btncopy').onclick = () => { navigator.clipboard.writeText(url); $('btncopy').textContent = '¡Copiado!'; };
 }
 
+// Envía el código por correo. Devuelve true si salió bien.
+async function sendCode(email) {
+  try {
+    const { error } = await sb.auth.signInWithOtp({ email });
+    if (error) { $('msg').textContent = 'Error: ' + error.message; return false; }
+    return true;
+  } catch (err) {
+    $('msg').textContent = 'Fallo de conexión: ' + err.message;
+    return false;
+  }
+}
+
 document.addEventListener('click', async e => {
   const t = e.target.closest('button,a'); if (!t) return;
   const d = t.dataset;
 
+  // --- Login por código ---
   if (t.id === 'btnsend') {
-    const email = $('email').value.trim(); 
-    if (!email) return;
+    const email = $('email').value.trim();
+    if (!email) { $('email').focus(); return; }
     t.disabled = true;
     $('msg').textContent = 'Enviando...';
+    const ok = await sendCode(email);
+    t.disabled = false;
+    if (ok) {
+      state.otpEmail = email;
+      store.set('otp_email', email);
+      render();
+      $('msg').textContent = '¡Listo! Revisa tu correo 📬';
+      $('code').focus();
+    }
+    return;
+  }
+  if (t.id === 'btnresend') {
+    t.disabled = true;
+    $('msg').textContent = 'Enviando...';
+    const ok = await sendCode(state.otpEmail);
+    t.disabled = false;
+    if (ok) $('msg').textContent = 'Código reenviado 📬';
+    return;
+  }
+  if (t.id === 'btnback') {
+    state.otpEmail = ''; store.del('otp_email'); render(); return;
+  }
+  if (t.id === 'btnverify') {
+    const token = $('code').value.replace(/\D/g, '');
+    if (token.length < 6) { $('msg').textContent = 'Escribe el código completo'; return; }
+    t.disabled = true;
+    $('msg').textContent = 'Verificando...';
     try {
-      const currentUrl = window.location.origin + window.location.pathname;
-      const redirectUrl = currentUrl.endsWith('/') ? currentUrl : currentUrl + '/';
-      
-      const { error } = await sb.auth.signInWithOtp({ 
-        email, 
-        options: { emailRedirectTo: redirectUrl } 
-      });
-      t.disabled = false;
+      const { error } = await sb.auth.verifyOtp({ email: state.otpEmail, token, type: 'email' });
       if (error) {
-        $('msg').textContent = 'Error: ' + error.message;
-      } else {
-        $('msg').textContent = '¡Listo! Revisa tu correo 📬';
+        t.disabled = false;
+        $('msg').textContent = 'Código incorrecto o vencido. Pide uno nuevo.';
       }
+      // Si va bien, onAuthStateChange inicia la sesión y dibuja la app
     } catch (err) {
       t.disabled = false;
       $('msg').textContent = 'Fallo de conexión: ' + err.message;
     }
     return;
   }
-  
+
   if (t.id === 'btnlogout') { await sb.auth.signOut(); return; }
   if (t.id === 'btninvite') { await showInvite(); return; }
   if (d.tab) { state.tab = d.tab; render(); return; }
@@ -330,6 +380,13 @@ document.addEventListener('click', async e => {
     await loadData(); closeModal(); render(); return;
   }
   if (d.ds) { await sb.from('supermarkets').delete().eq('id', d.ds); await loadData(); render(); return; }
+});
+
+// Enter en los campos del login
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  if (e.target.id === 'email' && $('btnsend')) $('btnsend').click();
+  if (e.target.id === 'code' && $('btnverify')) $('btnverify').click();
 });
 
 document.addEventListener('mousedown', e => { if (e.target.id === 'ov') closeModal(); });
